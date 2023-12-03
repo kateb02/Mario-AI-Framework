@@ -7,7 +7,7 @@ import engine.helper.MarioActions;
 
 public class Agent implements MarioAgent {
     private enum STATE {
-        WALK_FORWARD, WALK_BACKWARD, JUMP, JUMP_HOLE
+        WALK_FORWARD, WALK_BACKWARD, JUMP, JUMP_HOLE, STOP
     }
 
     private boolean facing_left;
@@ -19,7 +19,7 @@ public class Agent implements MarioAgent {
     @Override
     public void initialize(MarioForwardModel model, MarioTimer timer) {
         action = new boolean[MarioActions.numberOfActions()];
-        state = agents.kate.Agent.STATE.WALK_FORWARD;
+        state = agents.kate.Agent.STATE.STOP;
         facing_left = false;
 
         leftCounter = 0;
@@ -86,67 +86,74 @@ public class Agent implements MarioAgent {
         }
 
         switch (state) {
-            case WALK_BACKWARD:
-                if (leftCounter > 5) {
-                    state = agents.kate.Agent.STATE.WALK_FORWARD;
-                    facing_left = false;
-                }
-                leftCounter++;
-                action[MarioActions.LEFT.getValue()] = true;
-                action[MarioActions.RIGHT.getValue()] = false;
-
-                break;
-
-            case WALK_FORWARD:
+            case STOP:
+                //just make mario stand
                 action[MarioActions.LEFT.getValue()] = false;
-                if (thereIsHole(scene)) {
-                    state = agents.kate.Agent.STATE.JUMP_HOLE;
-                    action[MarioActions.JUMP.getValue()] = true;
-                    action[MarioActions.SPEED.getValue()] = true;
-                } else if (thereIsObstacle(scene)) {
-                    state = agents.kate.Agent.STATE.JUMP;
-                    action[MarioActions.JUMP.getValue()] = true;
-                    action[MarioActions.RIGHT.getValue()] = true;
-                    action[MarioActions.SPEED.getValue()] = false;
-                } else {
-                    action[MarioActions.RIGHT.getValue()] = true;
-                    action[MarioActions.SPEED.getValue()] = false;
-                }
+                action[MarioActions.RIGHT.getValue()] = false;
                 break;
 
-            case JUMP:
-                if (action[MarioActions.RIGHT.getValue()] && thereIsHole(scene)) {
-                    action[MarioActions.RIGHT.getValue()] = false;
-                    action[MarioActions.LEFT.getValue()] = true;
-
-                    facing_left = true;
-                } else if (model.isMarioOnGround()) {
-                    if (facing_left) {
-                        state = agents.kate.Agent.STATE.WALK_BACKWARD;
-                        leftCounter = 0;
-                    } else {
-                        state = agents.kate.Agent.STATE.WALK_FORWARD;
-                    }
-
-                    action[MarioActions.LEFT.getValue()] = false;
-                    action[MarioActions.RIGHT.getValue()] = false;
-
-                    action[MarioActions.JUMP.getValue()] = false;
-                    action[MarioActions.SPEED.getValue()] = false;
-                }
-                break;
-
-            case JUMP_HOLE:
-                if (model.isMarioOnGround()) {
-                    state = agents.kate.Agent.STATE.WALK_FORWARD;
-
-                    action[MarioActions.JUMP.getValue()] = false;
-                    action[MarioActions.SPEED.getValue()] = false;
-
-                    action[MarioActions.LEFT.getValue()] = false;
-                    action[MarioActions.RIGHT.getValue()] = false;
-                }
-                break;
+//            case WALK_BACKWARD:
+//                if (leftCounter > 5) {
+//                    state = agents.kate.Agent.STATE.WALK_FORWARD;
+//                    facing_left = false;
+//                }
+//                leftCounter++;
+//                action[MarioActions.LEFT.getValue()] = true;
+//                action[MarioActions.RIGHT.getValue()] = false;
+//
+//                break;
+//
+//            case WALK_FORWARD:
+//                action[MarioActions.LEFT.getValue()] = false;
+//                System.out.print("In state: walk forward");
+//                if (thereIsHole(scene)) {
+//                    state = agents.kate.Agent.STATE.JUMP_HOLE;
+//                    action[MarioActions.JUMP.getValue()] = true;
+//                    action[MarioActions.SPEED.getValue()] = true;
+//                } else if (thereIsObstacle(scene)) {
+//                    state = agents.kate.Agent.STATE.JUMP;
+//                    action[MarioActions.JUMP.getValue()] = true;
+//                    action[MarioActions.RIGHT.getValue()] = true;
+//                    action[MarioActions.SPEED.getValue()] = false;
+//                } else {
+//                    action[MarioActions.RIGHT.getValue()] = true;
+//                    action[MarioActions.SPEED.getValue()] = false;
+//                }
+//                break;
+//
+//            case JUMP:
+//                if (action[MarioActions.RIGHT.getValue()] && thereIsHole(scene)) {
+//                    action[MarioActions.RIGHT.getValue()] = false;
+//                    action[MarioActions.LEFT.getValue()] = true;
+//
+//                    facing_left = true;
+//                } else if (model.isMarioOnGround()) {
+//                    if (facing_left) {
+//                        state = agents.kate.Agent.STATE.WALK_BACKWARD;
+//                        leftCounter = 0;
+//                    } else {
+//                        state = agents.kate.Agent.STATE.WALK_FORWARD;
+//                    }
+//
+//                    action[MarioActions.LEFT.getValue()] = false;
+//                    action[MarioActions.RIGHT.getValue()] = false;
+//
+//                    action[MarioActions.JUMP.getValue()] = false;
+//                    action[MarioActions.SPEED.getValue()] = false;
+//                }
+//                break;
+//
+//            case JUMP_HOLE:
+//                if (model.isMarioOnGround()) {
+//                    state = agents.kate.Agent.STATE.WALK_FORWARD;
+//
+//                    action[MarioActions.JUMP.getValue()] = false;
+//                    action[MarioActions.SPEED.getValue()] = false;
+//
+//                    action[MarioActions.LEFT.getValue()] = false;
+//                    action[MarioActions.RIGHT.getValue()] = false;
+//                }
+//                break;
         }
 
         return action;
